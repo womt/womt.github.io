@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+{% block body %}
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <br></br>
+
+            <!-- ***************** -->
+            <!-- Current Day Games -->
+            <!-- ***************** -->
+            <div class = "col-lg-6">
+                <form id="dateform" action="/scores" method="POST" class="form-inline text-lg-center">
+                    <!-- Current Day Games -->
+                    <input type="text" name="date" id="datepicker" class="form-control form-control-lg" style="font-family:Helvetica, FontAwesome" placeholder="&#xf073; &nbsp;{{ pretty_today }}">
+                </form>
+                <!-- Team Record for Current Day Games-->
+                <div class="list-group">
+                    {% for i, game in games %}
+                    <a class="score-size text-xs-center nounderline list-group-item list-group-item-action" href="/boxscores/{{ game["GAME_ID"] }}">
+                        <div class="row">
+                        {% if winners[i] == game["AWAY_TEAM"] %}
+                            <div class="col-xs-4">
+                                <b class="winning-team">
+                                {% if game["AWAY_TEAM_IMG"] %}
+                                    <img class="team-logo" src="/static/{{ game["AWAY_TEAM_IMG"] }}">
+                                {% endif %}
+                                {{ game["AWAY_TEAM"] }} {{ game["AWAY_TEAM_PTS"] }}
+                                </b>
+                                <br>
+                                {{ game["AWAY_TEAM_WINS_LOSSES"] }}
+                            </div>
+                            <div class="col-xs-4 broadcast-column">
+                                <div class="final-text">
+                                    {{ game["GAME_STATUS_TEXT"] }}
+                                </div>
+                                <div class="broadcaster">
+                                    {{ game["BROADCASTER"] }}
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                            {% if game["HOME_TEAM_IMG"] %}
+                                <img class="team-logo" src="/static/{{ game["HOME_TEAM_IMG"] }}"> 
+                            {% endif %}
+                            {{ game["HOME_TEAM"] }} {{ game["HOME_TEAM_PTS"] }}
+                            <br>
+                            {{ game["HOME_TEAM_WINS_LOSSES"] }}
+                            </div>
+
+                        {% elif winners[i] == game["HOME_TEAM"] %}
+                            <div class="col-xs-4">
+                            {% if game["AWAY_TEAM_IMG"] %}
+                                <img class="team-logo" src="/static/{{ game["AWAY_TEAM_IMG"] }}">
+                            {% endif %} 
+                            {{ game["AWAY_TEAM"] }} {{ game["AWAY_TEAM_PTS"] }}
+                            <br>
+                            {{ game["AWAY_TEAM_WINS_LOSSES"] }}
+                            </div>
+
+                            <div class="col-xs-4 broadcast-column">
+                                <div class="final-text">
+                                    {{ game["GAME_STATUS_TEXT"] }}
+                                </div>
+                                <div class="broadcaster">
+                                    {{ game["BROADCASTER"] }}
+                                </div>
+                            </div>
+
+                            <div class="col-xs-4">
+                                <b class="winning-team">
+                                {% if game["HOME_TEAM_IMG"] %}
+                                    <img class="team-logo" src="/static/{{ game["HOME_TEAM_IMG"] }}"> 
+                                {% endif %}
+                                {{ game["HOME_TEAM"] }} {{ game["HOME_TEAM_PTS"] }}</b>
+                                <br>
+                            {{ game["HOME_TEAM_WINS_LOSSES"] }}
+                            </div>
+
+                        {% else %}
+                            <div class="col-xs-4">
+                                {% if game["AWAY_TEAM_IMG"] %}
+                                    <img class="team-logo" src="/static/{{ game["AWAY_TEAM_IMG"] }}"> 
+                                {% endif %} 
+                                {{ game["AWAY_TEAM"] }}
+                                {% if game["AWAY_TEAM_PTS"] %}
+                                    {{ game["AWAY_TEAM_PTS"] }}
+                                {% endif %}
+                                <br>
+                                {{ game["AWAY_TEAM_WINS_LOSSES"] }}
+                            </div>
+
+                            <div class="col-xs-4 broadcast-column">
+                                <div class="final-text">
+                                    {{ game["GAME_STATUS_TEXT"] }}
+                                </div>
+                                <div class="broadcaster">
+                                    {{ game["BROADCASTER"] }}
+                                </div>
+                            </div>
+
+                            <div class="col-xs-4">
+                                {% if game["HOME_TEAM_IMG"] %}
+                                    <img class="team-logo" src="/static/{{ game["HOME_TEAM_IMG"] }}"> 
+                                {% endif %} 
+                                {{ game["HOME_TEAM"] }}
+                                {%if game["HOME_TEAM_PTS"] %}
+                                    {{ game["HOME_TEAM_PTS"] }}
+                                {% endif %}
+                                <br>
+                                {{ game["HOME_TEAM_WINS_LOSSES"] }}
+                            </div>
+                        {% endif %}
+                        </div>
+                    </a>
+                {% endfor %} 
+                </div>
+            <!-- End of Current Games -->
+            </div>
+        <!-- End of Column that contains Current Games -->
+
+            <br></br>
+            <br></br>
+
+            <div class = "col-lg-6">
+                
+                <!-- ********* -->    
+                <!-- Standings -->
+                <!-- ********* -->    
+                <table class="standings-datatable-sm table table-sm">
+                    <thead class="thead-inverse">
+                        <tr>
+                            <th class="text-lg-center">SEED</th>
+                            <th class="bg-primary text-lg-center">TEAM</th>
+                            <th class="bg-primary text-lg-center">W-L</th>
+                            <th class="bg-danger text-lg-center">TEAM</th>
+                            <th class="bg-danger text-lg-center">W-L</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for i, value in east_standings %}
+                    <tr class="text-lg-center">
+                        {% if i < 9 %}
+                            <th class="text-lg-center">{{ i }}</th>
+                        {% else %}
+                            <td>{{ i }}</td>
+                        {% endif %}
+                        <th class="text-lg-center"><a class="nounderline grey" href="/teams/{{ value["TEAM_ID"] }}"><img class="team-logo-sm" src="/static/{{ team[value["TEAM"]]["img"] }}"> {{ team[value["TEAM"]]["abbrev"] }}</th>
+                        <td class="boxscore-column-width">{{ value["W"] }}-{{ value["L"] }}</td>
+                        <th class="text-lg-center"><a class="nounderline grey" href="/teams/{{ west_standings[i - 1]["TEAM_ID"] }}"><img class="team-logo" src="/static/{{ team[west_standings[i - 1]["TEAM"]]["img"] }}"> {{ team[west_standings[i - 1]["TEAM"]]["abbrev"] }}</th>
+                        <td class="boxscore-column-width">{{ west_standings[i - 1]["W"] }}-{{ west_standings[i - 1]["L"] }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- End of Standings -->
+                
+            </div>
+        </div> 
+    </div>
+{% endblock %}
